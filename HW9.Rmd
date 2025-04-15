@@ -1,0 +1,151 @@
+---
+title: "Homework 9 - https://github.com/Henryblake2777/Sds315_homework9"
+author: "Henry Blake - hrb987"
+date: "2025-15-09"
+output:
+  pdf_document:
+    toc: True
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      eval = TRUE,
+                      warning = FALSE,
+                      message = FALSE,
+                      fig.align = "center")
+
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(rvest)
+library(mosaic)
+library(MatchIt)
+
+solder <- read_csv('solder.csv')
+groceries <- read_csv('groceries.csv')
+```
+
+# Problem 1 - Manufacturing Flaws in Circut Boards
+
+## Part A - Plots
+
+```{r}
+ggplot(solder, aes(x = Opening, y = skips)) + geom_boxplot() + labs(
+  title = 'Skips per Opening Size',
+  x = 'Opening Size',
+  y = 'Number of Skips'
+)
+```
+
+This boxplot shows that smaller openings have more skips on average than larger openings.
+
+```{r}
+ggplot(solder, aes(x = Solder, y = skips)) + geom_boxplot() + labs(
+  title = 'Skips per Solder Thickness',
+  x = 'Solder Thickness',
+  y = 'Number of Skips'
+)
+```
+
+This boxplot shows that the thin solder has, on average, more skips than the thick solder does.
+
+## Part B - Linear Model
+
+```{r}
+skips_mdl <- do(10000)*lm(skips ~ Opening + Solder + Opening:Solder, data = resample(solder))
+confint(skips_mdl, level = .95)
+```
+
+## Part C - Interpretation
+
+The baseline number of skips for a large opening a thick solder is an estimated .393 with a main effect of 2.407 for medium openings, 5.127 for small openings, and a 2.280 for a thin solder. There is also an interaction effect of -.740 skips for medium openings and thin solders and 9.653 for small openings and thin solders.
+
+## Part D - Conclusion
+
+I would reccommend a large opening and thick solder because it is the baseline and has the least amount of skips according to the model.
+
+# Problem 2 - Grocery Store Prices
+
+## Part A - Store Prices
+
+```{r}
+groceries |>
+  group_by(Store) |>
+  summarize(mean_price = mean(Price)) |>
+  ggplot() + geom_col(aes(x = Store, y = mean_price), color = 'black', fill = 'darkgreen') + coord_flip() + labs(
+    title = 'Average Item Price Per Store',
+    y = 'Average Item Price',
+    x = 'Store'
+  )
+```
+
+The bar graph of store vs average item price shows that the most expensive store based on item price is Whole Foods, while the cheapest is Fiesta.
+
+## Part B - Item Availibility
+
+```{r}
+groceries |>
+  group_by(Product) |>
+  summarize(item_availibility = n()) |>
+  ggplot() + geom_col(aes(x = Product, y = item_availibility), color = 'black', fill = 'darkgreen') +   coord_flip() + labs(
+    title = 'Number of Stores Offering a Speciic Item',
+    y = 'Number of Stores',
+    x = 'Item'
+  )
+```
+
+The bar graph of item availibility vs item shows that the two most availible items are milk and eggs, while the leats are lucky charms, frosted flakes, el milagros tortilla chips, and cinnamon toast crunch.
+
+## Part C - Type of Store Linear Model
+
+```{r}
+type_lm <- lm(Price ~ Product + Type, data = groceries)
+confint(type_lm, level = .95)
+```
+
+Compared with ordinary grocery stores, convenience stores charge somewhere between
+.41 and .92 dollars more for the same product.
+
+## Part D - Store Linear Model
+
+```{r}
+store_lm <- lm(Price ~ Product + Store, data = groceries)
+coef(store_lm, level = .95)
+```
+
+According to the model, Whole foods and Wheatsville Food Co-Op are the two most expensive stores, while Kroger and Kroger Fresh Fare were the two cheapest
+
+## Part E - Price Discrimination
+
+While building the linear model, the product type is held constant, which means that Central Market does charge more per item> however, this is only around 7 cents more, which is a lot smaller of a difference compared to other stores.
+
+## Part F - Income
+
+```{r}
+groceries <- groceries |>
+  mutate(Income10k = Income %/% 10000)
+
+Income_lm <- lm(Price ~ Product + Income10k, data = groceries) 
+coef(Income_lm)
+
+-0.01310013 * ((sd(groceries$Income10k, na.rm = TRUE)) / sd(groceries$Price, na.rm = TRUE))
+```
+
+With an Income coeffecient of -.013, it shows that as average income increases, the price decreases, which means poorer areas tend to have to pay more for the same items.
+
+A one-standard deviation increase in the income of a ZIP code seems to be associated with
+a -.03 standard-deviation change in the price that consumers in that ZIP code expect to pay for
+the same product.
+
+# Problem 3 - Redlining
+
+A) True - The R-Squared value of .516 between minority percentage and FAIR policy shows that there is a moderate, positive, linear correlation betwwen them. The P-value of the coeffecient is also 0, which further shows the correlation.
+
+B) False - The R-Squared value of .061 between minority percentage and age shows that there is almost no linear correlation between the two. However, there is no test of a interaction in the models, so it could be ambiguous
+
+C) True/ambiguous - With a coeffecient of -.01 for minority:firerisklow, it shows that the places with a lower fire risk has a weaker relationship, however not that significant of a value
+
+D) False - When Income is added to the linear model, the coeffecient of the minority variable has a p-value of .002, which still shows that it has an affect on FAIR policy rates.
+
+E) True - The model has an R-Squared value of.66, which means that 66 percent of the variation can be explained by the factors of the model. This means that the other 34 percent is due to variation at the zip code level.
