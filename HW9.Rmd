@@ -112,13 +112,14 @@ Compared with ordinary grocery stores, convenience stores charge somewhere betwe
 ```{r}
 store_lm <- lm(Price ~ Product + Store, data = groceries)
 coef(store_lm, level = .95)
+confint(store_lm)
 ```
 
-According to the model, Whole foods and Wheatsville Food Co-Op are the two most expensive stores, while Kroger and Kroger Fresh Fare were the two cheapest
+According to the model, Whole foods and Wheatsville Food Co-Op are the two most expensive stores, while Walmart and Kroger Fresh Fare were the two cheapest
 
 ## Part E - Price Discrimination
 
-While building the linear model, the product type is held constant, which means that Central Market does charge more per item> however, this is only around 7 cents more, which is a lot smaller of a difference compared to other stores.
+The confidence intervals of the effect variables for Kroger and Kroger fresh overlap, which means there is not significant evidence that Kroger fresh charges more for the same items.
 
 ## Part F - Income
 
