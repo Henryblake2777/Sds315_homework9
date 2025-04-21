@@ -119,7 +119,7 @@ According to the model, Whole foods and Wheatsville Food Co-Op are the two most 
 
 ## Part E - Price Discrimination
 
-The confidence intervals of the effect variables for Kroger and Kroger fresh overlap, which means there is not significant evidence that Kroger fresh charges more for the same items.
+The confidence intervals of the effect variables for HEB and Central Market overlap, which means there is not significant evidence that Central Market charges more for the same items.
 
 ## Part F - Income
 
